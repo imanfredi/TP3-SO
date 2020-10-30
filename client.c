@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <stdlib.h>
 #include <unistd.h>
 #define PORT 8080
 #define ERROR_CHECK(x, msg)                                                                              \
@@ -18,7 +19,7 @@ int main(int argc, char const *argv[]) {
     int socketFd = 0;
     struct sockaddr_in serv_addr;
 
-    ERROR_CHECK((serverFd = socket(AF_INET, SOCK_STREAM, 0)), "Socket Failed");
+    ERROR_CHECK((socketFd = socket(AF_INET, SOCK_STREAM, 0)), "Socket Failed");
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
