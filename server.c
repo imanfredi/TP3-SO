@@ -1,13 +1,30 @@
 // Server side C/C++ program to demonstrate Socket programming
+#define PORT 8080
+#define _POSIX_C_SOURCE 200809L
+#define CHALLENGES 12
+#define ANSWER_SIZE 50
+#define BUFFER_SIZE 1024
+#define LOWER 70
+#define UPPER 100
+#define MIN_CHAR 33
+#define MAX_CHAR 126
+#define ERROR_CHECK(x, msg)                                                                              \
+    do {                                                                                                 \
+        int retval = (x);                                                                                \
+        if (retval == -1) {                                                                              \
+            fprintf(stderr, "Runtime error: %s returned %d at %s:%d\n", #x, retval, __FILE__, __LINE__); \
+            perror(msg);                                                                                 \
+            exit(-1);                                                                                    \
+        }                                                                                                \
+    } while (0)
+
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <time.h>
 #include <unistd.h>
-#define PORT 8080
-#define CHALLENGES 12
-#define ANSWER_SIZE 50
 
 static void challenge0();
 static void challenge1();
@@ -32,74 +49,62 @@ typedef struct {
     char answer[ANSWER_SIZE];
 } challenge_t;
 
-static challenge_t challenges[CHALLENGES] = {{&challenge0, "entendido\n"}, {&challenge1, "itba\n"}, {&challenge2, "M4GFKZ289aku\n"},
-                                                             {&challenge3, "fk3wfLCm3QvS\n"},{&challenge4, "too_easy\n"}, {&challenge5, ".RUN_ME\n"}, 
-                                                             {&challenge6, "K5n2UFfpFMUN\n"}, {&challenge7, "BUmyYq5XxXGt\n"}, {&challenge8, "u^v\n"}, 
-                                                             {&challenge9, "chin_chu_lan_cha\n"}};
+static challenge_t challenges[CHALLENGES] = {{&challenge0, "entendido\n"}, {&challenge1, "itba\n"}, {&challenge2, "M4GFKZ289aku\n"}, {&challenge3, "fk3wfLCm3QvS\n"}, {&challenge4, "too_easy\n"}, {&challenge5, ".RUN_ME\n"}, {&challenge6, "K5n2UFfpFMUN\n"}, {&challenge7, "BUmyYq5XxXGt\n"}, {&challenge8, "u^v\n"}, {&challenge9, "chin_chu_lan_cha\n"}};
+
+static int current;
 
 int main(int argc, char const *argv[]) {
-    int server_fd, new_socket, valread;
+    int serverFd, socketFd, opt = 1;
     struct sockaddr_in address;
-    int opt = 1;
     int addrlen = sizeof(address);
-    char buffer[1024] = {0};
+    char *buffer = NULL;
+    ssize_t read;
+    size_t bufferSize = 0;
+    FILE *socketFile;
+    current = 0;
 
-    // Creating socket file descriptor 
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
-    }
+    // Creating socket file descriptor
+    ERROR_CHECK((serverFd = socket(AF_INET, SOCK_STREAM, 0)), "Socket Failed");
 
     // Forcefully attaching socket to the port 8080
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
+    ERROR_CHECK(setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)), "Setting socket options failed");
+
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
 
     // Forcefully attaching socket to the port 8080
-    if (bind(server_fd, (struct sockaddr *)&address,
-             sizeof(address)) < 0) {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
-    }
-    if (listen(server_fd, 3) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
-    }
-    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0) {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
-    int current = 0;
-    while (current < CHALLENGES) {
+    ERROR_CHECK(bind(serverFd, (struct sockaddr *)&address, sizeof(address)), "Bind failed");
+    ERROR_CHECK(listen(serverFd, 1), "Listen failed");
+    ERROR_CHECK((socketFd = accept(serverFd, (struct sockaddr *)&address, (socklen_t *)&addrlen)), "Accept failed");
+
+    if ((socketFile = fdopen(socketFd, "w+")) == NULL)
+        ERROR_CHECK(-1, "Error opening file");
+
+    int aux = 1;
+    while (current < CHALLENGES && aux) {
+        clearScreen();
         challenge_t challenge = challenges[current];
         (challenge.message)();
-        valread = read(new_socket, buffer, 1024);
-        buffer[valread] = 0;
-        printf("Recibi: %s", buffer);
-        current += processAnswer(challenge.answer, buffer);
+        if ((read = getline(&buffer, &bufferSize, socketFile)) > 0) {
+            printf("Recibi: %s", buffer);
+            current += processAnswer(challenge.answer, buffer);
+        } else
+            aux = 0;
     }
+    fclose(socketFile);
+    close(socketFd);
+    close(serverFd);
 
     return 0;
 }
 
 static void challenge0() {
     challengeMessage();
-    printf("Bienvenidos al TP3 y felicitaciones, ya resolvieron el primer acertijo.\n\n");
-    printf("En este TP deberán finalizar el juego que ya comenzaron resolviendo los desafíos de cada nivel.\n");
-    printf("Además tendrán que investigar otras preguntas para responder durante la defensa.\n");
-    printf("El desafío final consiste en crear un programa que se comporte igual que yo, es decir, que provea los mismos desafíos y que sea necesario hacer lo mismo para resolverlos.\n");
-    printf("No basta con esperar la respuesta.\n");
-    printf("Además, deberán implementar otro programa para comunicarse conmigo.\n\n");
-    printf("Deberán estar atentos a los easter eggs\n\n");
-    printf("Para verificar que sus respuestas tienen el formato correcto respondan a este desafío con la palabra 'entendido\\n'\n");
+    printf("%s\n\n", "Bienvenidos al TP3 y felicitaciones, ya resolvieron el primer acertijo.\n\nEn este TP deberán finalizar el juego que ya comenzaron resolviendo los desafíos de cada nivel.\nAdemás tendrán que investigar otras preguntas para responder durante la defensa.\nEl desafío final consiste en crear un programa que se comporte igual que yo, es decir, que provea los mismos desafíos y que sea necesario hacer lo mismo para resolverlos.\nNo basta con esperar la respuesta.\nAdemás, deberán implementar otro programa para comunicarse conmigo.\n\nDeberán estar atentos a los easter eggs\n\nPara verificar que sus respuestas tienen el formato correcto respondan a este desafío con la palabra 'entendido\\n'\n");
     researchMessage();
     printf("¿Cómo descubrieron el protocolo, la dirección y el puerto para conectarse?\n");
 }
-
 
 static void challenge1() {
     challengeMessage();
@@ -118,16 +123,18 @@ static void challenge2() {
 
 static void challenge3() {
     challengeMessage();
-    printf("EBADF...\n\n");
-    printf("write: Bad file descriptor...\n\n");
-
+    char *aux = "La respuesta es fk3wfLCm3QvS\n";
+    printf("%s\n\n", "EBADF...");
+    if (write(13, aux, strlen(aux)) == -1) {
+        perror("write");
+    }
     researchMessage();
     printf("¿Qué útil abstracción es utilizada para comunicarse con sockets? ¿se puede utilizar read(2) y write(2) para operar?\n");
 }
 
 static void challenge4() {
     challengeMessage();
-    printf("respuesta = strings: 277\n\n");
+    printf("respuesta = strings: 277\n\n");  //cambiar este valor
     researchMessage();
     printf("¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?\n");
 }
@@ -141,8 +148,25 @@ static void challenge5() {
 
 static void challenge6() {
     challengeMessage();
-    printf("Filter error");
-    printf("Mensaje filtrado\n\n");
+    printf("Filter error\n\n");
+    srand(time(0));
+    char *answer = challenges[6].answer;
+    int answerLen = strlen(answer);
+    char aux[2];
+    aux[1] = 0;
+
+    int num = (rand() % (UPPER - LOWER + 1)) + LOWER;
+    
+    for (int i = 0, j = 0; i < num || j < answerLen;) {
+        if (rand() % (2) && j<answerLen) {
+            aux[0] = answer[j++];
+            write(STDOUT_FILENO,aux,1);
+        } else{
+            aux[0] = (rand() % (MAX_CHAR - MIN_CHAR + 1)) + MIN_CHAR;
+            write(STDERR_FILENO, aux, 1);
+            i++;
+        }
+    }
     researchMessage();
     printf("¿Cómo se puede implementar un servidor que atienda muchas conexiones sin usar procesos ni threads?\n");
 }
@@ -150,7 +174,8 @@ static void challenge6() {
 static void challenge7() {
     challengeMessage();
     printf("¿?\n\n");
-    printf("La respuesta es BUmyYq5XxXGt\n\n");
+    printf("\033[30;40m"); 
+    printf("La respuesta es BUmyYq5XxXGt\033[0m\n");
     researchMessage();
     printf("¿Qué aplicaciones se pueden utilizar para ver el tráfico por la red?\n");
 }
@@ -166,16 +191,39 @@ static void challenge8() {
 static void challenge9() {
     challengeMessage();
     printf("quine\n\n");
+    if(system("gcc quine.c -o quine") != 0){
+        puts("\n\nENTER para reintentar.\n");
+    }
+
+    printf("¡Genial!, ya lograron meter un programa en quine.c, veamos si hace lo que corresponde.");    
+    
+    if(1){
+
+    }
+    else
+        printf("La respuesta es chin_chu_lan_cha");
+    
+    
     researchMessage();
     printf("¿Cuáles son las características del protocolo SCTP?\n");
 }
+static void challenge10(){
+    challengeMessage();
+    printf("b gdbme y encontrá el valor magico\n");
+    researchMessage();
+    printf("¿Qué es un RFC?");
 
+}
+static void challenge11(){
+
+
+}
 static void challengeMessage() {
-    printf("\n------------- DESAFIO -------------\n");
+    puts("\n------------- DESAFIO -------------\n");
 }
 
 static void researchMessage() {
-    printf("\n----- PREGUNTA PARA INVESTIGAR -----\n");
+    puts("\n----- PREGUNTA PARA INVESTIGAR -----\n");
 }
 
 static int processAnswer(char *answer, char *received) {

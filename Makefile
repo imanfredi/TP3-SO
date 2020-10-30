@@ -2,15 +2,20 @@ CC = gcc
 CFLAGS = -pedantic -Wall -std=c99 -g
 RM = rm -f
 
-SOURCES = $(wildcard *.c)
-BINS = $(SOURCES:.c=.out)
+SOURCES_SERVER=server.c
+SOURCES_CLIENT=client.c
+SERVER=server
+CLIENT=client
 
-all: $(BINS)
+all: $(SERVER) $(CLIENT)
 
-%.out: %.c
+$(SERVER): $(SOURCES_SERVER)
+	$(CC) $^ -o $@ $(CFLAGS)
+
+$(CLIENT) : $(SOURCES_CLIENT) 
 	$(CC) $^ -o $@ $(CFLAGS)
 
 clean: 
-	$(RM) $(BINS)
+	$(RM) $(SERVER) $(CLIENT) quine
 
 .PHONY: all clean
