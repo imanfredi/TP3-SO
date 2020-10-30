@@ -49,7 +49,7 @@ typedef struct {
     char answer[ANSWER_SIZE];
 } challenge_t;
 
-static challenge_t challenges[CHALLENGES] = {{&challenge0, "entendido\n"}, {&challenge1, "itba\n"}, {&challenge2, "M4GFKZ289aku\n"}, {&challenge3, "fk3wfLCm3QvS\n"}, {&challenge4, "too_easy\n"}, {&challenge5, ".RUN_ME\n"}, {&challenge6, "K5n2UFfpFMUN\n"}, {&challenge7, "BUmyYq5XxXGt\n"}, {&challenge8, "u^v\n"}, {&challenge9, "chin_chu_lan_cha\n"}};
+static challenge_t challenges[CHALLENGES] = {{&challenge0, "entendido\n"}, {&challenge1, "itba\n"}, {&challenge2, "M4GFKZ289aku\n"}, {&challenge3, "fk3wfLCm3QvS\n"}, {&challenge4, "too_easy\n"}, {&challenge5, ".RUN_ME\n"}, {&challenge6, "K5n2UFfpFMUN\n"}, {&challenge7, "BUmyYq5XxXGt\n"}, {&challenge8, "u^v\n"}, {&challenge9, "chin_chu_lan_cha\n"},{&challenge10,"gdb_rules\n"},{&challenge11,"normal\n"}};
 
 static int current;
 
@@ -195,10 +195,12 @@ static void challenge9() {
         puts("\n\nENTER para reintentar.\n");
     }
 
-    printf("¡Genial!, ya lograron meter un programa en quine.c, veamos si hace lo que corresponde.");    
+    puts("¡Genial!, ya lograron meter un programa en quine.c, veamos si hace lo que corresponde.");    
     
-    if(1){
 
+    if(system("./quine | diff - quine.c") != 0){
+        printf("\n%s\n", "diff encontró diferencias.");
+        puts("\n\nENTER para reintentar.\n");
     }
     else
         printf("La respuesta es chin_chu_lan_cha");
@@ -207,13 +209,22 @@ static void challenge9() {
     researchMessage();
     printf("¿Cuáles son las características del protocolo SCTP?\n");
 }
+
+static void gdbme(){
+    int pid = getpid();
+    if(pid == 0x123456789){
+        printf("la respuesta es gdb_rules");
+    }
+}
+
 static void challenge10(){
     challengeMessage();
     printf("b gdbme y encontrá el valor magico\n");
     researchMessage();
     printf("¿Qué es un RFC?");
-
+    gdbme();
 }
+
 static void challenge11(){
 
 
