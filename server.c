@@ -1,5 +1,7 @@
-// Server side C/C++ program to demonstrate Socket programming
+
+
 #define PORT 8080
+#define PI 3.14159265358979323846
 #define _POSIX_C_SOURCE 200809L
 #define CHALLENGES 12
 #define ANSWER_SIZE 50
@@ -25,6 +27,7 @@
 #include <sys/socket.h>
 #include <time.h>
 #include <unistd.h>
+#include <math.h>
 
 static void challenge0();
 static void challenge1();
@@ -45,7 +48,7 @@ static void researchMessage();
 static int processAnswer(char *answer, char *received);
 
 typedef struct {
-    void (*message)();
+    void (*level)();
     char answer[ANSWER_SIZE];
 } challenge_t;
 
@@ -81,17 +84,22 @@ int main(int argc, char const *argv[]) {
     if ((socketFile = fdopen(socketFd, "w+")) == NULL)
         ERROR_CHECK(-1, "Error opening file");
 
-    int aux = 1;
-    while (current < CHALLENGES && aux) {
+    int ok = 1;
+    while (current < CHALLENGES && ok) {
         clearScreen();
         challenge_t challenge = challenges[current];
-        (challenge.message)();
+        (challenge.level)();
         if ((read = getline(&buffer, &bufferSize, socketFile)) > 0) {
             printf("Recibi: %s", buffer);
             current += processAnswer(challenge.answer, buffer);
         } else
             aux = 0;
     }
+
+    if(current >= CHALLENGES){
+        printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n");
+    }
+
     fclose(socketFile);
     close(socketFd);
     close(serverFd);
@@ -134,12 +142,12 @@ static void challenge3() {
 
 static void challenge4() {
     challengeMessage();
-    printf("respuesta = strings: 277\n\n");  //cambiar este valor
+    printf("respuesta = strings: 128\n\n");  //cambiar este valor
     researchMessage();
     printf("¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?\n");
 }
 
-static void challenge5() {
+__attribute__((section(".RUN_ME"))) static void challenge5() {
     challengeMessage();
     printf(".data .bss .comment ? .shstrtab .symtab .strtab\n\n");
     researchMessage();
@@ -226,8 +234,18 @@ static void challenge10(){
 }
 
 static void challenge11(){
-
-
+    challengeMessage();
+    printf("Me conoces\n\n");
+    double x,y,aux;
+    for(int i =0 ; i < 1000; i++){
+        x = rand() / ( (double) RAND_MAX + 1);
+        y = rand() / ( (double) RAND_MAX + 1);
+        aux = sqrt(-2*log(x))*cos(2* PI *y);
+        printf("%.6f ",aux);
+    }
+    putchar('\n');
+    researchMessage();
+    printf("¿Fue divertido?\n");
 }
 static void challengeMessage() {
     puts("\n------------- DESAFIO -------------\n");

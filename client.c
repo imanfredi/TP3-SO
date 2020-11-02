@@ -41,7 +41,7 @@ int main(int argc, char const *argv[]) {
     send(socketFd, "BUmyYq5XxXGt\n", strlen("BUmyYq5XxXGt\n"), 0);          //estaba escrita ahi
     send(socketFd, "u^v\n", strlen("u^v\n"), 0);                            //se utilizo objdump -s server
     send(socketFd, "chin_chu_lan_cha\n", strlen("chin_chu_lan_cha\n"), 0);  //se utilizo objdump -s server
-    send(socketFd, "gdb_rules\n", strlen("gdb_rules\n"), 0);                //se utilizo el edb
+   // send(socketFd, "gdb_rules\n", strlen("gdb_rules\n"), 0);                //se utilizo el edb
 
     char c;
     char sendbuff[300];
