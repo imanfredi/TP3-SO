@@ -79,7 +79,7 @@ int main(int argc, char const *argv[]) {
     ERROR_CHECK(listen(serverFd, 1), "Listen failed");
     ERROR_CHECK((socketFd = accept(serverFd, (struct sockaddr *)&address, (socklen_t *)&addrlen)), "Accept failed");
 
-    if ((socketFile = fdopen(socketFd, "w+")) == NULL)
+    if ((socketFile = fdopen(socketFd, "r")) == NULL)
         ERROR_CHECK(-1, "Error opening file");
 
     int ok = 1;
@@ -97,12 +97,7 @@ int main(int argc, char const *argv[]) {
         printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n");
     }
 
-    if(fclose(socketFile) != 0){
-        ERROR_CHECK(-1,"Error closing file");
-    }
-    ERROR_CHECK(close(socketFd),"Error closing file descriptor");
     ERROR_CHECK(close(serverFd),"Error closing file descriptor");
-
     return 0;
 }
 
@@ -141,7 +136,7 @@ static void challenge3() {
 
 static void challenge4() {
     challengeMessage();
-    printf("respuesta = strings: 128\n\n");  //cambiar este valor
+    printf("respuesta = strings: 128\n\n");
     researchMessage();
     printf("¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?\n");
 }
@@ -165,7 +160,7 @@ static void challenge6() {
     int num = (rand() % (UPPER - LOWER + 1)) + LOWER;
     
     for (int i = 0, j = 0; i < num || j < answerLen;) {
-        if (rand() % (2) && j<answerLen) {
+        if ( (rand() % 2 ) && j<answerLen) {
             aux[0] = answer[j++];
             write(STDOUT_FILENO,aux,1);
         } else{
