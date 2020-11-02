@@ -93,7 +93,7 @@ int main(int argc, char const *argv[]) {
             printf("Recibi: %s", buffer);
             current += processAnswer(challenge.answer, buffer);
         } else
-            aux = 0;
+            ok = 0;
     }
 
     if(current >= CHALLENGES){
