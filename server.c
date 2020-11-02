@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 
 #define PORT 8080
@@ -41,7 +43,6 @@ static void challenge8();
 static void challenge9();
 static void challenge10();
 static void challenge11();
-
 static void clearScreen();
 static void challengeMessage();
 static void researchMessage();
@@ -54,18 +55,15 @@ typedef struct {
 
 static challenge_t challenges[CHALLENGES] = {{&challenge0, "entendido\n"}, {&challenge1, "itba\n"}, {&challenge2, "M4GFKZ289aku\n"}, {&challenge3, "fk3wfLCm3QvS\n"}, {&challenge4, "too_easy\n"}, {&challenge5, ".RUN_ME\n"}, {&challenge6, "K5n2UFfpFMUN\n"}, {&challenge7, "BUmyYq5XxXGt\n"}, {&challenge8, "u^v\n"}, {&challenge9, "chin_chu_lan_cha\n"},{&challenge10,"gdb_rules\n"},{&challenge11,"normal\n"}};
 
-static int current;
-
 int main(int argc, char const *argv[]) {
-    int serverFd, socketFd, opt = 1;
+    int serverFd, socketFd, opt = 1,current=0;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     char *buffer = NULL;
     ssize_t read;
     size_t bufferSize = 0;
     FILE *socketFile;
-    current = 0;
-
+    
     // Creating socket file descriptor
     ERROR_CHECK((serverFd = socket(AF_INET, SOCK_STREAM, 0)), "Socket Failed");
 
@@ -90,7 +88,6 @@ int main(int argc, char const *argv[]) {
         challenge_t challenge = challenges[current];
         (challenge.level)();
         if ((read = getline(&buffer, &bufferSize, socketFile)) > 0) {
-            printf("Recibi: %s", buffer);
             current += processAnswer(challenge.answer, buffer);
         } else
             ok = 0;
@@ -100,9 +97,11 @@ int main(int argc, char const *argv[]) {
         printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n");
     }
 
-    fclose(socketFile);
-    close(socketFd);
-    close(serverFd);
+    if(fclose(socketFile) != 0){
+        ERROR_CHECK(-1,"Error closing file");
+    }
+    ERROR_CHECK(close(socketFd),"Error closing file descriptor");
+    ERROR_CHECK(close(serverFd),"Error closing file descriptor");
 
     return 0;
 }

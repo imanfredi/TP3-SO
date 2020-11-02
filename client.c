@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
@@ -31,16 +33,16 @@ int main(int argc, char const *argv[]) {
 
     ERROR_CHECK(connect(socketFd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)), "Connection Failed");
 
-    send(socketFd, "entendido\n", strlen("entendido\n"), 0);
-    send(socketFd, "itba\n", strlen("itba\n"), 0);                          //se decodifico la imagen
-    send(socketFd, "M4GFKZ289aku\n", strlen("M4GFKZ289aku\n"), 0);          //se utilizo forensycs para analizar la image
-    send(socketFd, "fk3wfLCm3QvS\n", strlen("fk3wfLCm3QvS\n"), 0);          //con ltrace nos fijamos las syscalls y ver en que momento se producia el error
-    send(socketFd, "too_easy\n", strlen("too_easy\n"), 0);                  //se utilizo el comando strings server > cat.txt
-    send(socketFd, ".RUN_ME\n", strlen(".RUN_ME\n"), 0);                    //se utilizo objdump -s server
-    send(socketFd, "K5n2UFfpFMUN\n", strlen("K5n2UFfpFMUN\n"), 0);          //se utilizo objdump -s server
-    send(socketFd, "BUmyYq5XxXGt\n", strlen("BUmyYq5XxXGt\n"), 0);          //estaba escrita ahi
-    send(socketFd, "u^v\n", strlen("u^v\n"), 0);                            //se utilizo objdump -s server
-    send(socketFd, "chin_chu_lan_cha\n", strlen("chin_chu_lan_cha\n"), 0);  //se utilizo objdump -s server
+    //send(socketFd, "entendido\n", strlen("entendido\n"), 0);
+    //send(socketFd, "itba\n", strlen("itba\n"), 0);                          //se decodifico la imagen
+   // send(socketFd, "M4GFKZ289aku\n", strlen("M4GFKZ289aku\n"), 0);          //se utilizo forensycs para analizar la image
+   // send(socketFd, "fk3wfLCm3QvS\n", strlen("fk3wfLCm3QvS\n"), 0);          //con ltrace nos fijamos las syscalls y ver en que momento se producia el error
+   // send(socketFd, "too_easy\n", strlen("too_easy\n"), 0);                  //se utilizo el comando strings server > cat.txt
+   // send(socketFd, ".RUN_ME\n", strlen(".RUN_ME\n"), 0);                    //se utilizo objdump -s server
+   // send(socketFd, "K5n2UFfpFMUN\n", strlen("K5n2UFfpFMUN\n"), 0);          //se utilizo objdump -s server
+   // send(socketFd, "BUmyYq5XxXGt\n", strlen("BUmyYq5XxXGt\n"), 0);          //estaba escrita ahi
+   // send(socketFd, "u^v\n", strlen("u^v\n"), 0);                            //se utilizo objdump -s server
+   // send(socketFd, "chin_chu_lan_cha\n", strlen("chin_chu_lan_cha\n"), 0);  //se utilizo objdump -s server
    // send(socketFd, "gdb_rules\n", strlen("gdb_rules\n"), 0);                //se utilizo el edb
 
     char c;
