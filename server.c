@@ -82,17 +82,17 @@ int main(int argc, char const *argv[]) {
     if ((socketFile = fdopen(socketFd, "r")) == NULL)
         ERROR_CHECK(-1, "Error opening file");
 
-    int ok = 1;
+    int reading = 1;
     srand(time(0));
 
-    while (current < CHALLENGES && ok) {
+    while (current < CHALLENGES && reading) {
         clearScreen();
         challenge_t challenge = challenges[current];
         (challenge.level)();
         if ((read = getline(&buffer, &bufferSize, socketFile)) > 0)
             current += processAnswer(challenge.answer, buffer);
         else
-            ok = 0;
+            reading = 0;
     }
 
     if (current >= CHALLENGES)
@@ -154,7 +154,7 @@ static void challenge4() {
 
 __attribute__((section(".RUN_ME"))) static void challenge5() {
     challengeMessage();
-    printf(".data .bss .comment ? .shstrtab .symtab .strtab\n\n");
+    printf(".plt.got .text ? .fini .rodata .eh_frame_hdr .strtab\n\n");
     researchMessage();
     printf("Un servidor suele crear un nuevo proceso o thread para atender las conexiones entrantes. ¿Qué conviene más?\n");
 }
@@ -162,7 +162,7 @@ __attribute__((section(".RUN_ME"))) static void challenge5() {
 static void challenge6() {
     challengeMessage();
     printf("Filter error\n\n");
-    char *answer = challenges[6].answer;
+    char *answer = challenges[6].answer; 
     int answerLen = strlen(answer);
     char aux[2];
     aux[1] = 0;

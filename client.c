@@ -33,7 +33,6 @@ int main(int argc, char const *argv[]) {
 
     ERROR_CHECK(connect(socketFd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)), "Connection Failed");
 
-
     int c;
     char sendbuff[300];
     int i = 0;
