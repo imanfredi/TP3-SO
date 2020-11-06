@@ -230,7 +230,7 @@ static void challenge9() {
 
 static void gdbme() {
 
-    int pid = getpid();
+    long long  pid = getpid();
     if (pid == 0x123456789)
         printf("la respuesta es gdb_rules");
 }
