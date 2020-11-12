@@ -40,7 +40,6 @@ int main(int argc, char const *argv[]) {
         sendbuff[i++] = c;
         if (c == '\n') {
             sendbuff[i] = 0;
-            printf("%s", sendbuff);
             send(socketFd, sendbuff, strlen(sendbuff), 0);
             i = 0;
         }

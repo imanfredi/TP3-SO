@@ -30,32 +30,31 @@
 #include <time.h>
 #include <unistd.h>
 
-static void challenge0();
-static void challenge1();
-static void challenge2();
-static void challenge3();
-static void challenge4();
-static void challenge5();
-static void challenge6();
-static void challenge7();
-static void challenge8();
-static void challenge9();
-static void challenge10();
-static void challenge11();
+static void challenge0(int index);
+static void challenge1(int index);
+static void challenge2(int index);
+static void challenge3(int index);
+static void challenge4(int index);
+static void challenge5(int index);
+static void challenge6(int index);
+static void challenge7(int index);
+static void challenge8(int index);
+static void challenge9(int index);
+static void challenge10(int index);
+static void challenge11(int index);
 static void clearScreen();
 static void challengeMessage();
 static void researchMessage();
 static int processAnswer(char *answer, char *received);
 
 typedef struct {
-    void (*level)();
+    void (*level)(int index);
     char answer[ANSWER_SIZE];
 } challenge_t;
 
 static challenge_t challenges[CHALLENGES] = {{&challenge0, "entendido\n"}, {&challenge1, "itba\n"}, {&challenge2, "M4GFKZ289aku\n"}, {&challenge3, "fk3wfLCm3QvS\n"}, {&challenge4, "too_easy\n"}, {&challenge5, ".RUN_ME\n"}, {&challenge6, "K5n2UFfpFMUN\n"}, {&challenge7, "BUmyYq5XxXGt\n"}, {&challenge8, "u^v\n"}, {&challenge9, "chin_chu_lan_cha\n"}, {&challenge10, "gdb_rules\n"}, {&challenge11, "normal\n"}};
 
 int main(int argc, char const *argv[]) {
-    
     int serverFd, socketFd, opt = 1, current = 0;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
@@ -88,7 +87,7 @@ int main(int argc, char const *argv[]) {
     while (current < CHALLENGES && reading) {
         clearScreen();
         challenge_t challenge = challenges[current];
-        (challenge.level)();
+        (challenge.level)(current);
         if ((read = getline(&buffer, &bufferSize, socketFile)) > 0)
             current += processAnswer(challenge.answer, buffer);
         else
@@ -98,41 +97,33 @@ int main(int argc, char const *argv[]) {
     if (current >= CHALLENGES)
         printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n");
 
-
     ERROR_CHECK(close(serverFd), "Error closing file descriptor");
     return 0;
 }
 
-static void challenge0() {
-
+static void challenge0(int index) {
     challengeMessage();
     printf("%s\n\n", "Bienvenidos al TP3 y felicitaciones, ya resolvieron el primer acertijo.\n\nEn este TP deberán finalizar el juego que ya comenzaron resolviendo los desafíos de cada nivel.\nAdemás tendrán que investigar otras preguntas para responder durante la defensa.\nEl desafío final consiste en crear un programa que se comporte igual que yo, es decir, que provea los mismos desafíos y que sea necesario hacer lo mismo para resolverlos.\nNo basta con esperar la respuesta.\nAdemás, deberán implementar otro programa para comunicarse conmigo.\n\nDeberán estar atentos a los easter eggs\n\nPara verificar que sus respuestas tienen el formato correcto respondan a este desafío con la palabra 'entendido\\n'\n");
     researchMessage();
     printf("¿Cómo descubrieron el protocolo, la dirección y el puerto para conectarse?\n");
-
 }
 
-static void challenge1() {
-
+static void challenge1(int index) {
     challengeMessage();
     printf("The Wire S1E5\n");
     printf("5295 888 6288\n\n");
     researchMessage();
     printf("¿Qué diferencias hay entre TCP y UDP y en qué casos conviene usar cada uno?\n");
-
 }
 
-static void challenge2() {
-
+static void challenge2(int index) {
     challengeMessage();
     printf("https://ibb.co/tc0Hb6w\n");
     researchMessage();
     printf("¿El puerto que usaron para conectarse al server es el mismo que usan para mandar las respuestas? ¿Por qué?\n");
-
 }
 
-static void challenge3() {
-
+static void challenge3(int index) {
     challengeMessage();
     char *aux = "La respuesta es fk3wfLCm3QvS\n";
     printf("%s\n\n", "EBADF...");
@@ -142,27 +133,26 @@ static void challenge3() {
 
     researchMessage();
     printf("¿Qué útil abstracción es utilizada para comunicarse con sockets? ¿se puede utilizar read(2) y write(2) para operar?\n");
-
 }
 
-static void challenge4() {
+static void challenge4(int index) {
     challengeMessage();
-    printf("respuesta = strings: 128\n\n");
+    printf("respuesta = strings: 129\n\n");
     researchMessage();
     printf("¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?\n");
 }
 
-__attribute__((section(".RUN_ME"))) static void challenge5() {
+__attribute__((section(".RUN_ME"))) static void challenge5(int index) {
     challengeMessage();
-    printf(".plt.got .text ? .fini .rodata .eh_frame_hdr .strtab\n\n");
+    printf(".plt .text ? .fini .rodata .eh_frame_hdr .eh_frame\n\n");
     researchMessage();
     printf("Un servidor suele crear un nuevo proceso o thread para atender las conexiones entrantes. ¿Qué conviene más?\n");
 }
 
-static void challenge6() {
+static void challenge6(int index) {
     challengeMessage();
     printf("Filter error\n\n");
-    char *answer = challenges[6].answer; 
+    char *answer = challenges[index].answer;
     int answerLen = strlen(answer);
     char aux[2];
     aux[1] = 0;
@@ -182,11 +172,9 @@ static void challenge6() {
 
     researchMessage();
     printf("¿Cómo se puede implementar un servidor que atienda muchas conexiones sin usar procesos ni threads?\n");
-
 }
 
-static void challenge7() {
-
+static void challenge7(int index) {
     challengeMessage();
     printf("¿?\n\n");
     printf("\033[30;40m");
@@ -195,21 +183,17 @@ static void challenge7() {
 
     researchMessage();
     printf("¿Qué aplicaciones se pueden utilizar para ver el tráfico por la red?\n");
-
 }
 
-static void challenge8() {
-    
+static void challenge8(int index) {
     challengeMessage();
     printf("Latexme\n\n");
     printf("Si\n \\mathrm{d}y = u^v{\\cdot}(v'{\\cdot}\\ln{(u)}+v{\\cdot}\\frac{u'}{u}) entonces\ny =");
     researchMessage();
     printf("sockets es un mecanismo de IPC. ¿Qué es más eficiente entre sockets y pipes?\n");
-
 }
 
-static void challenge9() {
-    
+static void challenge9(int index) {
     challengeMessage();
     printf("quine\n\n");
 
@@ -229,27 +213,25 @@ static void challenge9() {
 }
 
 static void gdbme() {
-
-    long long  pid = getpid();
+    long long pid = getpid();
     if (pid == 0x123456789)
         printf("la respuesta es gdb_rules");
 }
 
-static void challenge10() {
-    
+static void challenge10(int index) {
     challengeMessage();
     printf("b gdbme y encontrá el valor magico\n");
-    
+
     researchMessage();
     printf("¿Qué es un RFC?");
-    
+
     gdbme();
 }
 
-static void challenge11() {
+static void challenge11(int index) {
     challengeMessage();
     printf("Me conoces\n\n");
-    
+
     double x, y, aux;
     for (int i = 0; i < 1000; i++) {
         x = rand() / ((double)RAND_MAX + 1);
@@ -258,7 +240,7 @@ static void challenge11() {
         printf("%.6f ", aux);
     }
     putchar('\n');
-    
+
     researchMessage();
     printf("¿Fue divertido?\n");
 }
